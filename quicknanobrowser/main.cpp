@@ -48,8 +48,6 @@
 **
 ****************************************************************************/
 
-#include "utils.h"
-
 #ifndef QT_NO_WIDGETS
 #include <QtWidgets/QApplication>
 typedef QApplication Application;
@@ -57,36 +55,101 @@ typedef QApplication Application;
 #include <QtGui/QGuiApplication>
 typedef QGuiApplication Application;
 #endif
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlContext>
-#include <QtWebEngine/qtwebengineglobal.h>
+#include <QWebEngineView>
 
-static QUrl startupUrl()
+#include <QtNetwork>
+
+#include <QTcpServer>
+
+class Server : public QObject
 {
-    QUrl ret;
-    QStringList args(qApp->arguments());
-    args.takeFirst();
-    Q_FOREACH (const QString& arg, args) {
-        if (arg.startsWith(QLatin1Char('-')))
-             continue;
-        ret = Utils::fromUserInput(arg);
-        if (ret.isValid())
-            return ret;
+public:
+    explicit Server(QWebEngineView &view);
+    bool listen(const QHostAddress &address = QHostAddress::Any, quint16 port = 1234);
+
+private slots:
+    void onConnection();
+    void onRead();
+
+private:
+    QTcpServer server;
+    QWebEngineView &view;
+};
+
+Server::Server(QWebEngineView &view)
+    : server(this)
+    , view(view)
+{
+}
+
+bool Server::listen(const QHostAddress &address, quint16 port)
+{
+    if (!server.listen(address, port)) {
+        qCritical() << server.errorString();
+        return false;
     }
-    return QUrl(QStringLiteral("http://qt.io/"));
+
+    connect(&server, &QTcpServer::newConnection, this, &Server::onConnection);
+
+    QString ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
+    QList<QHostAddress> ipAddressList = QNetworkInterface::allAddresses();
+    for (int i = 0; i < ipAddressList.size(); ++i) {
+        if (ipAddressList.at(i) != QHostAddress::LocalHost &&
+            ipAddressList.at(i).toIPv4Address()) {
+            ipAddress = ipAddressList.at(i).toString();
+            break;
+        }
+    }
+
+    if (ipAddress.isEmpty())
+        ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
+
+    qInfo() << ipAddress<< ":" << port;
+
+    return true;
+}
+
+void Server::onConnection()
+{
+    QTcpSocket *socket = server.nextPendingConnection();
+    connect(socket, &QAbstractSocket::readyRead, this, &Server::onRead);
+}
+
+void Server::onRead()
+{
+    QTcpSocket *socket = dynamic_cast<QTcpSocket*>(sender());
+    if (!socket)
+        return;
+
+    char data[1024];
+    qint64 size = socket->readLine(data, sizeof(data));
+    if (!size)
+        return;
+
+    data[size] = 0;
+    while (data[size-1] == '\n') data[--size] = 0;
+    if (!size)
+        return;
+
+    socket->write(data);
+    socket->disconnectFromHost();
+
+    view.setUrl(QUrl(data));
 }
 
 int main(int argc, char **argv)
 {
     Application app(argc, argv);
 
-    QtWebEngine::initialize();
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
-    QQmlApplicationEngine appEngine;
-    Utils utils;
-    appEngine.rootContext()->setContextProperty("utils", &utils);
-    appEngine.load(QUrl("qrc:/ApplicationRoot.qml"));
-    QMetaObject::invokeMethod(appEngine.rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
+    QWebEngineView view;
+    view.showFullScreen();
+    view.setUrl(QUrl("https://www.savoirfairelinux.com"));
+
+    Server server(view);
+    if (!server.listen())
+        return 1;
 
     return app.exec();
 }
