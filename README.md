@@ -1,2 +1,2 @@
-# webviewer
-A QT Web-Viewer controllable with tcp socket
+# qurlew
+The original URL picker
