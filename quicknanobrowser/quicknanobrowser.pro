@@ -7,6 +7,7 @@ TARGET = quicknanobrowser
 #QT       += network
 #CONFIG   += debug
 #CONFIG   += console
+CONFIG   += c++11
 
 #HEADERS = utils.h
 SOURCES = main.cpp
