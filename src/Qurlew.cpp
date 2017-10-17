@@ -26,8 +26,8 @@ void Qurlew::urlChanged(const QUrl &url)
 	qDebug() << "URL changed: " << url;
 }
 
-void Qurlew::lineRead(const QString &line)
+void Qurlew::urlRequested(const QString &url)
 {
-	qDebug() << "Changing URL: " << line;
-	view.setUrl(QUrl(line));
+	qDebug() << "URL requested: " << url;
+	view.setUrl(QUrl(url));
 }

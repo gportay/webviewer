@@ -23,7 +23,7 @@ public:
 	explicit Qurlew(QObject *parent = 0);
 
 public slots:
-	void lineRead(const QString &line);
+	void urlRequested(const QString &url);
 
 private:
 	QWebEngineView view;

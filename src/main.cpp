@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 
 	Qurlew qurlew;
 	QObject::connect(&input, &StandardInput::lineRead, &qurlew,
-			 &Qurlew::lineRead);
+			 &Qurlew::urlRequested);
 
 	return app.exec();
 }
