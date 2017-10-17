@@ -13,12 +13,12 @@
 
 #include <QDebug>
 
-Qurlew::Qurlew(QObject *parent) :
+Qurlew::Qurlew(const QString &url, QObject *parent) :
 	QObject(parent)
 {
 	connect(&view, &QWebEngineView::urlChanged, this, &Qurlew::urlChanged);
 	view.showFullScreen();
-	view.setUrl(QUrl("https://www.savoirfairelinux.com"));
+	view.setUrl(QUrl(url));
 }
 
 void Qurlew::urlChanged(const QUrl &url)

@@ -20,7 +20,7 @@ class Qurlew : public QObject
 	Q_OBJECT
 
 public:
-	explicit Qurlew(QObject *parent = 0);
+	explicit Qurlew(const QString &url = "", QObject *parent = 0);
 
 public slots:
 	void urlRequested(const QString &url);
