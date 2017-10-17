@@ -17,6 +17,8 @@ typedef QApplication Application;
 typedef QGuiApplication Application;
 #endif
 
+#include <QCommandLineParser>
+
 #include "Qurlew.hpp"
 #include "StandardInput.hpp"
 
@@ -24,6 +26,15 @@ int main(int argc, char **argv)
 {
 	Application app(argc, argv);
 
+	QCommandLineParser parser;
+	parser.setApplicationDescription(
+			"A stdin controlled WebBrowser based on Qt WebEngine.");
+	parser.addVersionOption();
+	parser.addHelpOption();
+	parser.process(app);
+
+	QCoreApplication::setApplicationName("Qurlew");
+	QCoreApplication::setApplicationVersion("0.1");
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 	StandardInput input;
