@@ -29,6 +29,10 @@ int main(int argc, char **argv)
 	QCommandLineParser parser;
 	parser.setApplicationDescription(
 			"A stdin controlled WebBrowser based on Qt WebEngine.");
+	QCommandLineOption urlOption(QStringList() << "u" << "url",
+			QCoreApplication::translate("main", "Set default URL."),
+			QCoreApplication::translate("main", "url"));
+	parser.addOption(urlOption);
 	parser.addVersionOption();
 	parser.addHelpOption();
 	parser.process(app);
@@ -41,7 +45,8 @@ int main(int argc, char **argv)
 	QObject::connect(&input, &StandardInput::closed, &app,
 			 &Application::quit);
 
-	Qurlew qurlew;
+	QString url = parser.value(urlOption);
+	Qurlew qurlew(url);
 	QObject::connect(&input, &StandardInput::lineRead, &qurlew,
 			 &Qurlew::urlRequested);
 
