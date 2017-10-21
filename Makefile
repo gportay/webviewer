@@ -33,10 +33,23 @@ install-doc: qurlew.1.gz
 	install -d $(DESTDIR)/usr/share/man/man1/
 	install -m 644 qurlew.1.gz $(DESTDIR)/usr/share/man/man1/
 
+.PHONY: install-bash-completion
+install-bash-completion:
+	completionsdir=$$(pkg-config --variable=completionsdir bash-completion); \
+	if [ -n "$$completionsdir" ]; then \
+		install -d $(DESTDIR)$$completionsdir/; \
+		install -m 644 support/bash-completion \
+			$(DESTDIR)$$completionsdir/qurlew; \
+	fi
+
 .PHONY: uninstall
 uninstall:
 	$(MAKE) -C src $@
 	rm -f $(DESTDIR)/usr/share/man/man1/qurlew.1.gz
+	completionsdir=$$(pkg-config --variable=completionsdir bash-completion); \
+	if [ -n "$$completionsdir" ]; then \
+		rm -f $(DESTDIR)$$completionsdir/qurlew; \
+	fi
 
 .PHONY: clean
 clean:

@@ -1,0 +1,32 @@
+#
+# Copyright (C) 2017  Savoir-faire Linux Inc.
+#	Gaël Portay <gael.portay@savoirfairelinux.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+
+_qurlew()
+{
+	local cur prev words cword
+	_init_completion || return
+
+	case $prev in
+	-u|--url)
+		_filedir
+		return
+		;;
+	esac
+
+	local short_opts="-u -v -h"
+	local long_opts="--url --version --help"
+	if [[ "$cur" == -* ]]; then
+		COMPREPLY=( $( compgen -W "$short_opts $long_opts" -- "$cur" ) )
+		return
+	fi
+
+	return
+} &&
+complete -F _qurlew qurlew
