@@ -1,0 +1,75 @@
+= qurlew(1)
+:doctype: manpage
+:author: Gaël PORTAY
+:email: gael.portay@savoirfairelinux.com
+:lang: en
+:man manual: Qurlew Manual
+:man source: qurlew 0.1
+
+== NAME
+
+qurlew - web browsing from stdin
+
+== SYNOPSIS
+
+*qurlew* [OPTIONS]
+
+== DESCRIPTION
+
+*qurlew(1)* is a simple Web Brower that picks URLs from its _standard input_, one URL per line, until it closes.
+
+== OPTIONS
+
+**-u, --url <url>**::
+	  Set default URL.
+
+**-v, --version**::
+	Displays version information.
+
+**-h, --help**::
+	Displays this help.
+
+== EXAMPLES
+
+Open *qurlew(1)* with an _interactive_ console and type in URLs. _Ctrl+D_ closes _stdin_ and terminate.
+
+[source,sh]
+----
+$ qurlew
+https://github.com/qurlew/qurlew
+^D
+----
+
+Run it as a service thanks *nc(1)* by piping its _standard input_ into an _Unix socket_.
+
+[source,sh]
+----
+$ nc -klU /tmp/qurlew.socket | qurlew &
+----
+
+And latter, update URLs thanks the _socket_.
+
+[source,sh]
+----
+$ nc -U /tmp/qurlew.socket
+https://github.com/qurlew/qurlew
+^D
+----
+
+== BUGS
+
+Report bugs at *https://github.com/qurlew/qurlew/issues*
+
+== AUTHOR
+
+Written by Vivien Didelot *vivien.didelot@savoirfairelinux.com* and Gaël Portay *gael.portay@savoirfairelinux.com*
+
+== COPYRIGHT
+
+Copyright (C) 2017  Savoir-faire Linux Inc.
+
+Qurlew is licensed under the terms of the GPLv3.
+
+== TRIVIA
+
+Qurlew stands for Qt URL WebEngine.
