@@ -1,0 +1,60 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides: qurlew
+# Required-Start: $local_fs $network
+# Required-Stop: $local_fs $network
+# Default-Start:  2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop service qurlew server
+# Description: Qurlew is an Unix socket address bar controlled Web Browser 
+### END INIT INFO
+
+set -e
+
+DAEMON="/bin/sh"
+NAME="Unix socket server"
+DAEMONUSER="qurlew"
+PIDFILE="/tmp/qurlew.pid"
+DESC="Qurlew"
+ARGS="/usr/bin/nc -klU /tmp/qurlew.socket | /usr/bin/qurlew"
+
+case "$1" in
+start)
+	shift
+	echo -n "starting $DESC: $NAME... "
+	if ! start-stop-daemon --start --pidfile "$PIDFILE" --make-pidfile \
+		--background --user "$DAEMONUSER" --exec "$DAEMON" -- -c "$ARGS" ; then
+		echo "failed."
+		exit 1
+	fi
+	echo "done."
+	;;
+stop)
+	shift
+	echo -n "stopping $DESC: $NAME... "
+	if ! start-stop-daemon --stop --pidfile "$PIDFILE" >/dev/null; then
+		echo "already stopped!"
+		exit 0
+	fi
+	rm -f "$PIDFILE"
+	echo "done."
+	;;
+restart|reload)
+	shift
+	echo -n "restarting $DESC: $NAME... "
+	$0 stop >/dev/null
+	$0 start >/dev/null
+	echo "done."
+	;;
+status)
+	shift
+	if ! pid="$(cat "$PIDFILE" 2>/dev/null)"; then
+		exit 1
+	fi
+	echo "$pid"
+	;;
+*)
+	echo "Usage: ${0##*/} {start|stop|restart|reload|status}" >&2
+	exit 1
+	;;
+esac
