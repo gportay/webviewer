@@ -6,7 +6,7 @@
 # Default-Start:  2 3 4 5
 # Default-Stop: 0 1 6
 # Short-Description: start and stop service qurlew server
-# Description: Qurlew is an Unix socket address bar controlled Web Browser 
+# Description: Qurlew is an Unix socket address bar controlled Web Browser
 ### END INIT INFO
 
 set -e
