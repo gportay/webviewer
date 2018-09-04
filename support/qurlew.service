@@ -1,0 +1,8 @@
+[Unit]
+Description=Qurlew
+
+[Service]
+ExecStart=/bin/bash -c "nc -klU /tmp/qurlew.socket | /usr/bin/qurlew --url http://www.github.com/qurlew"
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,115 @@
+= Qurlew - web browsing from stdin
+:toc:
+:toc-title:
+
+== What is it?
+
+Qurlew is a fullscreen web browser displaying URLs read from its standard input.
+Think about Qurlew as a minimalist browser whose address bar is deported in stdin.
+This can be a good candidate to build custom systems such as a smart TV OS.
+
+It is based on link:https://wiki.qt.io/QtWebEngine[QtWebEngine], which is a link:https://en.wikipedia.org/wiki/Qt_(software)[Qt] class wrapping the link:https://www.chromium.org/Home[Chromium] web browser.
+
+NOTE: Qurlew can stand for _Qt URL WebEngine_, or something like that... +
+To be honest, _curlew_ was a word containing _URL_ and a _w_ for _web_, replacing the _c_ with _q_ for _Qt_ made a neat candidate name for this project!
+
+== Getting started
+
+Qurlew depends on _qt5-webengine_, a package of the same name on most Linux distributions.
+
+You can download and compile the project from source with:
+
+[source,sh]
+----
+git clone git@github.com:qurlew/qurlew.git
+cd qurlew/
+qmake
+make
+----
+
+Try the browser with:
+
+[source,sh]
+----
+./src/qurlew -u https://github.com:qurlew/qurlew
+----
+
+== Examples
+
+Qurlew picks URLs from its standard input, one URL per line, and so on until stdin closes.
+There are many use cases for this, below are a few of them.
+
+=== Interactive Console
+
+[source,sh]
+----
+./src/qurlew
+https://github.com/qurlew/qurlew
+^D
+----
+
+=== Basic while loop scheduling
+
+You can simply loop on a few chosen URLs every two seconds with:
+
+[source,sh]
+----
+while :
+do
+  echo https://github.com/qurlew/qrab
+  sleep 2
+  echo https://github.com/qurlew/buildroot
+  sleep 2
+done | ./src/qurlew
+----
+
+=== Basic file based scheduling
+
+Drop a few HTML file in a `pages` directory and rotate them every five seconds 
+with:
+
+[source,sh]
+----
+for i in pages/*.html
+do
+  echo "file://$PWD/$i"
+  sleep 5
+done | ./src/qurlew
+----
+
+Note that you need to specify a full path URL.
+
+=== Socket
+
+(openbsd) _netcat_ is a great tool to wire up a socket interface to an application.
+
+==== INET socket
+
+If you need a network access to the web browser, you can plug a TCP socket with:
+
+[source,sh]
+----
+nc -kl 1234 | ./src/qurlew
+----
+
+Or use `-u` for an UDP socket.
+
+Send URLs with `echo https://github.com/qurlew | nc localhost 1234`.
+
+The `-k` option will keep the socket listening for new connections.
+
+==== Unix socket
+
+A Unix domain socket is useful to keep Qurlew running as a local service, without access from the network.
+
+[source,sh]
+----
+nc -klU /tmp/qurlew.socket | ./src/qurlew
+----
+
+Send URLs with `echo https://github.com/qurlew | nc -NU /tmp/qurlew.socket`.
+
+== License
+
+Qurlew is licensed under the terms of the GPLv3.
+See the link:LICENSE[] file.
